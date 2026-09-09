@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="AuctionService/AuctionService.csproj" />
+  </Folder>
+</Solution>

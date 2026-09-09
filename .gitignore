@@ -1,0 +1,30 @@
+## .NET Build artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio cache & temporary files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## JetBrains Rider / Visual Studio Code
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Node / Frontend (for future web UI additions)
+node_modules/
+dist/
+.angular/
