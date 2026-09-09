@@ -11,4 +11,10 @@ public class AuctionDbContext : DbContext
 
     public DbSet<Auction> Auctions { get; set; }
     public DbSet<Item> Items { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuctionDbContext).Assembly);
+    }
 }

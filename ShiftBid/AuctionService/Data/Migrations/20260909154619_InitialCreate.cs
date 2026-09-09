@@ -17,14 +17,14 @@ namespace AuctionService.Data.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     ReservePrice = table.Column<int>(type: "integer", nullable: false),
-                    Seller = table.Column<string>(type: "text", nullable: false),
-                    Winner = table.Column<string>(type: "text", nullable: true),
+                    Seller = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Winner = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     SoldAmount = table.Column<int>(type: "integer", nullable: true),
                     CurrentHighBid = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AuctionEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false)
+                    Status = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -36,13 +36,13 @@ namespace AuctionService.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    Make = table.Column<string>(type: "text", nullable: false),
-                    Model = table.Column<string>(type: "text", nullable: false),
+                    Make = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Model = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Year = table.Column<int>(type: "integer", nullable: false),
-                    Color = table.Column<string>(type: "text", nullable: false),
+                    Color = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
                     Mileage = table.Column<int>(type: "integer", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     AuctionId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
