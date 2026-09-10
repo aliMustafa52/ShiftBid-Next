@@ -24,4 +24,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Initialize and seed database
+try
+{
+    DbInitializer.InitDb(app);
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while initializing or seeding the database.");
+}
+
 app.Run();
