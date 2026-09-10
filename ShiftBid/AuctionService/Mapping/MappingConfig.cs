@@ -20,8 +20,9 @@ public class MappingConfig : IRegister
             .Map(dest => dest.Description, src => src.Item.Description)
             .Map(dest => dest.ImageUrl, src => src.Item.ImageUrl);
 
-        // CreateAuctionDto -> Auction (constructs and populates child Item)
+        // CreateAuctionDto -> Auction (constructs child Item and guarantees UTC AuctionEnd)
         config.NewConfig<CreateAuctionDto, Auction>()
+            .Map(dest => dest.AuctionEnd, src => DateTime.SpecifyKind(src.AuctionEnd, DateTimeKind.Utc))
             .Map(dest => dest.Item, src => src.Adapt<Item>());
 
         // UpdateAuctionDto -> Item (partial update: ignore null fields)
