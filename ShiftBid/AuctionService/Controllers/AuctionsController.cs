@@ -22,7 +22,6 @@ public class AuctionsController : ControllerBase
     public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions([FromQuery] string? date)
     {
         var query = _context.Auctions
-            .Include(a => a.Item)
             .OrderBy(a => a.Item.Make)
             .AsQueryable();
 
@@ -35,24 +34,27 @@ public class AuctionsController : ControllerBase
             }
         }
 
-        var auctions = await query.ToListAsync();
+        var auctions = await query
+            .ProjectToType<AuctionDto>()
+            .ToListAsync();
 
-        return Ok(auctions.Adapt<List<AuctionDto>>());
+        return Ok(auctions);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<AuctionDto>> GetAuctionById(string id)
     {
         var auction = await _context.Auctions
-            .Include(a => a.Item)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .Where(a => a.Id == id)
+            .ProjectToType<AuctionDto>()
+            .FirstOrDefaultAsync();
 
         if (auction == null)
         {
             return NotFound();
         }
 
-        return Ok(auction.Adapt<AuctionDto>());
+        return Ok(auction);
     }
 
     [HttpPost]
