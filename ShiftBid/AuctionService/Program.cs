@@ -1,4 +1,5 @@
 using AuctionService.Data;
+using AuctionService.Middleware;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddDbContext<AuctionDbContext>(options =>
 {
@@ -19,6 +23,8 @@ TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+app.UseExceptionHandler();
 
 app.UseAuthorization();
 
