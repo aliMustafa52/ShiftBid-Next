@@ -33,5 +33,33 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  search-service:
+    image: search-service
+    container_name: shiftbid-search-service
+    build:
+      context: ./ShiftBid/SearchService
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Meilisearch__Url=http://meilisearch:7700
+      - Meilisearch__Key=masterKey123!
+    ports:
+      - "7002:7002"
+    depends_on:
+      - meilisearch
+    restart: unless-stopped
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: shiftbid-meilisearch
+    environment:
+      - MEILI_MASTER_KEY=masterKey123!
+    ports:
+      - "7700:7700"
+    volumes:
+      - shiftbid-meili-data:/meili_data
+    restart: unless-stopped
+
 volumes:
   shiftbid-pgdata:
+  shiftbid-meili-data:
