@@ -43,6 +43,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - Meilisearch__Url=http://meilisearch:7700
       - Meilisearch__Key=masterKey123!
+      - AuctionSvcUrl=http://auction-service:7001
     ports:
       - "7002:7002"
     depends_on:
