@@ -3,12 +3,14 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy project file and restore dependencies (leveraging Docker layer cache)
-COPY AuctionService.csproj .
-RUN dotnet restore AuctionService.csproj
+COPY AuctionService/AuctionService.csproj AuctionService/
+COPY Contracts/Contracts.csproj Contracts/
+RUN dotnet restore AuctionService/AuctionService.csproj
 
 # Copy remaining source code and publish in Release mode
-COPY . .
-RUN dotnet publish AuctionService.csproj -c Release -o /app/publish /p:UseAppHost=false
+COPY AuctionService/ AuctionService/
+COPY Contracts/ Contracts/
+RUN dotnet publish AuctionService/AuctionService.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime

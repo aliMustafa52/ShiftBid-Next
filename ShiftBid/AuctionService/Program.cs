@@ -1,7 +1,10 @@
 using AuctionService.Data;
 using AuctionService.Middleware;
+using Contracts;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Wolverine;
+using Wolverine.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,20 @@ builder.Services.AddDbContext<AuctionDbContext>(options =>
 
 // Configure Mapster mappings
 TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
+
+builder.Host.UseWolverine(opts =>
+{
+    opts.UseRabbitMq(rabbit =>
+    {
+        rabbit.HostName = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
+        rabbit.UserName = builder.Configuration["RabbitMQ:Username"] ?? "guest";
+        rabbit.Password = builder.Configuration["RabbitMQ:Password"] ?? "guest";
+    })
+    .DeclareExchange("auction-created", ex => ex.ExchangeType = ExchangeType.Fanout)
+    .AutoProvision();
+
+    opts.PublishMessage<AuctionCreated>().ToRabbitExchange("auction-created");
+});
 
 var app = builder.Build();
 

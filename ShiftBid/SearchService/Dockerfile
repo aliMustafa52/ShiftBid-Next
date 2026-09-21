@@ -3,12 +3,14 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy project file and restore dependencies
-COPY SearchService.csproj .
-RUN dotnet restore SearchService.csproj
+COPY SearchService/SearchService.csproj SearchService/
+COPY Contracts/Contracts.csproj Contracts/
+RUN dotnet restore SearchService/SearchService.csproj
 
 # Copy remaining source code and publish in Release mode
-COPY . .
-RUN dotnet publish SearchService.csproj -c Release -o /app/publish /p:UseAppHost=false
+COPY SearchService/ SearchService/
+COPY Contracts/ Contracts/
+RUN dotnet publish SearchService/SearchService.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
