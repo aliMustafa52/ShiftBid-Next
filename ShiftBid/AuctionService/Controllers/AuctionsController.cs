@@ -6,15 +6,17 @@ using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 
 namespace AuctionService.Controllers;
 
 [ApiController]
 [Route("api/auctions")]
-public class AuctionsController(AuctionDbContext context, IMessageBus messageBus) : ControllerBase
+public class AuctionsController(AuctionDbContext context, 
+    IDbContextOutbox<AuctionDbContext> dbContextOutbox) : ControllerBase
 {
     private readonly AuctionDbContext _context = context;
-    private readonly IMessageBus _messageBus = messageBus;
+    private readonly IDbContextOutbox<AuctionDbContext> _dbContextOutbox = dbContextOutbox;
 
     [HttpGet]
     public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions([FromQuery] string? date)
@@ -65,16 +67,11 @@ public class AuctionsController(AuctionDbContext context, IMessageBus messageBus
 
         _context.Auctions.Add(auction);
 
-        var result = await _context.SaveChangesAsync() > 0;
-
-        if (!result)
-        {
-            return BadRequest("Could not save changes to the database");
-        }
-
         var newAuction = auction.Adapt<AuctionDto>();
 
-        await _messageBus.PublishAsync(newAuction.Adapt<AuctionCreated>());
+        await _dbContextOutbox.PublishAsync(newAuction.Adapt<AuctionCreated>());
+
+        await _dbContextOutbox.SaveChangesAndFlushMessagesAsync();
 
         return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id }, newAuction);
     }

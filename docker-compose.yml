@@ -26,6 +26,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=auctions;User Id=postgres;Password=postgrespw;
+      - RabbitMQ__Host=rabbitmq
     ports:
       - "7001:7001"
     depends_on:
@@ -44,6 +45,7 @@ services:
       - Meilisearch__Url=http://meilisearch:7700
       - Meilisearch__Key=masterKey123!
       - AuctionSvcUrl=http://auction-service:7001
+      - RabbitMQ__Host=rabbitmq
     ports:
       - "7002:7002"
     depends_on:

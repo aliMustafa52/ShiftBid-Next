@@ -4,6 +4,8 @@ using Contracts;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.Postgresql;
 using Wolverine.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,9 +17,13 @@ builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddDbContext<AuctionDbContext>(options =>
+var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connString))
+    throw new Exception("Connection string is empty");
+
+builder.Services.AddDbContextWithWolverineIntegration<AuctionDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(connString);
 });
 
 // Configure Mapster mappings
@@ -34,7 +40,14 @@ builder.Host.UseWolverine(opts =>
     .DeclareExchange("auction-created", ex => ex.ExchangeType = ExchangeType.Fanout)
     .AutoProvision();
 
-    opts.PublishMessage<AuctionCreated>().ToRabbitExchange("auction-created");
+    opts.PublishMessage<AuctionCreated>()
+    .ToRabbitExchange("auction-created");
+
+    opts.PersistMessagesWithPostgresql(connString, "auctions_rmq");
+
+    opts.UseEntityFrameworkCoreTransactions();
+
+    opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
 });
 
 var app = builder.Build();
