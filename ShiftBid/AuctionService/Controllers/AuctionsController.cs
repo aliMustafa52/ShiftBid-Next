@@ -104,14 +104,11 @@ public class AuctionsController(AuctionDbContext context,
         updateAuctionDto.Adapt(auction.Item);
         auction.UpdatedAt = DateTime.UtcNow;
 
-        var result = await _context.SaveChangesAsync() > 0;
+        await _dbContextOutbox.PublishAsync(auction.Adapt<AuctionUpdated>());
 
-        if (result)
-        {
-            return Ok();
-        }
+        await _dbContextOutbox.SaveChangesAndFlushMessagesAsync();
 
-        return BadRequest("Problem saving changes to the database");
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -138,14 +135,11 @@ public class AuctionsController(AuctionDbContext context,
 
         _context.Auctions.Remove(auction);
 
-        var result = await _context.SaveChangesAsync() > 0;
+        await _dbContextOutbox.PublishAsync(new AuctionDeleted { Id = auction.Id });
 
-        if (result)
-        {
-            return Ok();
-        }
+        await _dbContextOutbox.SaveChangesAndFlushMessagesAsync();
 
-        return BadRequest("Could not update the database");
+        return Ok();
     }
 
     [HttpPost("test")]

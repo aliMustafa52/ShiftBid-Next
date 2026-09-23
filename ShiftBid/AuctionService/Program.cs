@@ -38,16 +38,26 @@ builder.Host.UseWolverine(opts =>
         rabbit.Password = builder.Configuration["RabbitMQ:Password"] ?? "guest";
     })
     .DeclareExchange("auction-created", ex => ex.ExchangeType = ExchangeType.Fanout)
+    .DeclareExchange("auction-updated", ex => ex.ExchangeType = ExchangeType.Fanout)
+    .DeclareExchange("auction-deleted", ex => ex.ExchangeType = ExchangeType.Fanout)
     .AutoProvision();
 
     opts.PublishMessage<AuctionCreated>()
     .ToRabbitExchange("auction-created");
+
+    opts.PublishMessage<AuctionUpdated>()
+    .ToRabbitExchange("auction-updated");
+
+    opts.PublishMessage<AuctionDeleted>()
+    .ToRabbitExchange("auction-deleted");
 
     opts.PersistMessagesWithPostgresql(connString, "auctions_rmq");
 
     opts.UseEntityFrameworkCoreTransactions();
 
     opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
+
+    opts.ListenToRabbitQueue("wolverine-dead-letter-queue");
 });
 
 var app = builder.Build();
