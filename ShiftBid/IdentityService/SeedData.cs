@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using IdentityModel;
 using IdentityService.Data;
 using IdentityService.Models;
