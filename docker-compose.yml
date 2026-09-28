@@ -72,6 +72,21 @@ services:
     volumes:
       - shiftbid-rabbitmq-data:/var/lib/rabbitmq
     restart: unless-stopped
+  identity-service:
+    image: identity-service
+    container_name: shiftbid-identity-service
+    build:
+      context: ./ShiftBid
+      dockerfile: IdentityService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=identity;User Id=postgres;Password=postgrespw;
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   shiftbid-pgdata:

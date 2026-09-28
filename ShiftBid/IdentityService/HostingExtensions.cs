@@ -35,6 +35,12 @@ internal static class HostingExtensions
             .AddInMemoryApiScopes(Config.ApiScopes)
             .AddInMemoryClients(Config.Clients)
             .AddAspNetIdentity<ApplicationUser>();
+
+        builder.Services
+            .ConfigureApplicationCookie(opt =>
+            {
+                opt.Cookie.SameSite = SameSiteMode.Lax;
+            });
         
         builder.Services.AddAuthentication()
             .AddGoogle(options =>
