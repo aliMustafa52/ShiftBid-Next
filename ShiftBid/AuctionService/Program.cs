@@ -2,6 +2,7 @@ using AuctionService.Data;
 using AuctionService.Middleware;
 using Contracts;
 using Mapster;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
@@ -16,6 +17,17 @@ builder.Services.AddControllers();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = builder.Configuration["IdentityServiceUrl"];
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+        //options.TokenValidationParameters.NameClaimType = "username";
+        options.TokenValidationParameters.ValidateIssuer = false;
+    });
 
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connString))
@@ -66,6 +78,7 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -27,6 +27,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=auctions;User Id=postgres;Password=postgrespw;
       - RabbitMQ__Host=rabbitmq
+      - IdentityServiceUrl=http://identity-service:5000
     ports:
       - "7001:7001"
     depends_on:
@@ -82,7 +83,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=identity;User Id=postgres;Password=postgrespw;
     ports:
-      - "5000:5000"
+      - "5001:5000"
     depends_on:
       postgres:
         condition: service_healthy

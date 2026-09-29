@@ -3,6 +3,7 @@ using AuctionService.DTOs;
 using AuctionService.Entities;
 using Contracts;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
@@ -57,6 +58,7 @@ public class AuctionsController(AuctionDbContext context,
         return Ok(auction);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
     {
@@ -76,6 +78,7 @@ public class AuctionsController(AuctionDbContext context,
         return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id }, newAuction);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAuction(string id, UpdateAuctionDto updateAuctionDto)
     {
@@ -111,6 +114,7 @@ public class AuctionsController(AuctionDbContext context,
         return NoContent();
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAuction(string id)
     {
