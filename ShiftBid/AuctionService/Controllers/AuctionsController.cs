@@ -65,7 +65,7 @@ public class AuctionsController(AuctionDbContext context,
         var auction = createAuctionDto.Adapt<Auction>();
 
         // Set the seller from User claims (defaults to "test" until JWT auth is connected)
-        auction.Seller = User.Identity?.Name ?? "test";
+        auction.Seller = User.Identity?.Name ?? throw new Exception("Not Authendticated go away");
 
         _context.Auctions.Add(auction);
 

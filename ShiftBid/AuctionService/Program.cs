@@ -25,7 +25,7 @@ builder.Services
         options.Authority = builder.Configuration["IdentityServiceUrl"];
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters.ValidateAudience = false;
-        //options.TokenValidationParameters.NameClaimType = "username";
+        options.TokenValidationParameters.NameClaimType = "username";
         options.TokenValidationParameters.ValidateIssuer = false;
     });
 
