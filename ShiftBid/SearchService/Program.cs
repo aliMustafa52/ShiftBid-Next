@@ -45,14 +45,20 @@ builder.Host.UseWolverine(opts =>
     .DeclareExchange("auction-created", ex => ex.ExchangeType = ExchangeType.Fanout)
     .DeclareExchange("auction-updated", ex => ex.ExchangeType = ExchangeType.Fanout)
     .DeclareExchange("auction-deleted", ex => ex.ExchangeType = ExchangeType.Fanout)
+    .DeclareExchange("auction-finished", ex => ex.ExchangeType = ExchangeType.Fanout)
+    .DeclareExchange("bid-placed", ex => ex.ExchangeType = ExchangeType.Fanout)
     .BindExchange("auction-created").ToQueue("search-auction-created")
     .BindExchange("auction-updated").ToQueue("search-auction-updated")
     .BindExchange("auction-deleted").ToQueue("search-auction-deleted")
+    .BindExchange("auction-finished").ToQueue("auction-auction-finished")
+    .BindExchange("bid-placed").ToQueue("auction-bid-placed")
     .AutoProvision();
 
     opts.ListenToRabbitQueue("search-auction-created");
     opts.ListenToRabbitQueue("search-auction-updated");
     opts.ListenToRabbitQueue("search-auction-deleted");
+    opts.ListenToRabbitQueue("auction-auction-finished");
+    opts.ListenToRabbitQueue("auction-bid-placed");
 
     opts.OnException<TransientSearchException>()
     .RetryWithCooldown(

@@ -2,6 +2,7 @@ using Duende.IdentityServer;
 using IdentityService.Data;
 using IdentityService.Models;
 using IdentityService.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -13,6 +14,13 @@ internal static class HostingExtensions
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddRazorPages();
+
+        var dataProtectionKeysPath = builder.Configuration["DataProtection:KeysPath"];
+        if (!string.IsNullOrWhiteSpace(dataProtectionKeysPath))
+        {
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
+        }
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

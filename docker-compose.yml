@@ -82,6 +82,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=identity;User Id=postgres;Password=postgrespw;
+    volumes:
+      - shiftbid-identity-signing-keys:/app/keys
+      - shiftbid-identity-data-protection-keys:/app/data-protection-keys
     ports:
       - "5001:5000"
     depends_on:
@@ -89,7 +92,28 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  gateway-service:
+    image: gateway-service
+    container_name: shiftbid-gateway-service
+    build:
+      context: ./ShiftBid
+      dockerfile: GatewayService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ReverseProxy__Clusters__auctions__Destinations__auctionApi__Address=http://auction-service:7001
+      - ReverseProxy__Clusters__search__Destinations__searchApi__Address=http://search-service:7002
+      - IdentityServiceUrl=http://identity-service:5000
+    ports:
+      - "6001:6001"
+    depends_on:
+      - auction-service
+      - search-service
+      - identity-service
+    restart: unless-stopped
+
 volumes:
   shiftbid-pgdata:
   shiftbid-meili-data:
   shiftbid-rabbitmq-data:
+  shiftbid-identity-signing-keys:
+  shiftbid-identity-data-protection-keys:

@@ -6,3 +6,5 @@
 **/.idea
 **/*.user
 **/*.suo
+IdentityService/keys/
+IdentityService/data-protection-keys/
