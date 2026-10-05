@@ -33,6 +33,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     restart: unless-stopped
 
   search-service:
@@ -50,7 +52,10 @@ services:
     ports:
       - "7002:7002"
     depends_on:
-      - meilisearch
+      meilisearch:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     restart: unless-stopped
 
   meilisearch:
@@ -62,6 +67,12 @@ services:
       - "7700:7700"
     volumes:
       - shiftbid-meili-data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
 
   rabbitmq:
@@ -72,6 +83,12 @@ services:
       - "15672:15672"
     volumes:
       - shiftbid-rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
   identity-service:
     image: identity-service
@@ -99,10 +116,7 @@ services:
       context: ./ShiftBid
       dockerfile: GatewayService/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ReverseProxy__Clusters__auctions__Destinations__auctionApi__Address=http://auction-service:7001
-      - ReverseProxy__Clusters__search__Destinations__searchApi__Address=http://search-service:7002
-      - IdentityServiceUrl=http://identity-service:5000
+      - ASPNETCORE_ENVIRONMENT=Docker
     ports:
       - "6001:6001"
     depends_on:
